@@ -1,4 +1,4 @@
-from ..core import db
+from core import db
 
 def commit(obj):
     """

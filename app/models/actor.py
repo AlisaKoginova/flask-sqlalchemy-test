@@ -1,8 +1,8 @@
 from datetime import datetime as dt
-
-from ..core import db
-from .relations import association
 from .base import Model
+
+from core import db
+from .relations import association
 
 class Actor(Model, db.Model):
     __tablename__ = 'actors'

@@ -1,8 +1,10 @@
 from flask import jsonify, make_response
+from ast import literal_eval
+from datetime import datetime as dt
 
-from app.models.actor import Actor
-from app.models.movie import Movie
-from ..settings.constants import MOVIE_FIELDS
+from models.movie import Movie
+from models.actor import Actor
+from settings.constants import MOVIE_FIELDS
 from .parse_request import get_request_data
 
 def get_all_movies():
@@ -44,11 +46,18 @@ def add_movie():
     """
     Add new movie
     """
-    data = get_request_data()
 
-    new_record = Movie.create(**data)
-    new_movie = {k: v for k, v in new_record.__dict__.items() if k in MOVIE_FIELDS}
-    return make_response(jsonify(new_movie), 200)
+    data = get_request_data()
+    try:
+        if data['year'].isdigit() and len(data['year']) == 4 and data['genre'].isalpha():
+            new_record = Movie.create(**data)
+            new_movie = {k: v for k, v in new_record.__dict__.items() if k in MOVIE_FIELDS}
+            return make_response(jsonify(new_movie), 200)
+        else:
+            return make_response(jsonify(error='ERROR'), 400)
+
+    except:
+        return make_response(jsonify(error='ERROR'), 400)
 
 
 def update_movie():
@@ -59,13 +68,16 @@ def update_movie():
     if 'id' in data.keys():
         try:
             row_id = int(data['id'])
+            if data['year'].isdigit() and len(data['year']) == 4 and data['genre'].isalpha():
+                upd_record = Movie.update(row_id, **data)
+                upd_movie = {k: v for k, v in upd_record.__dict__.items() if k in MOVIE_FIELDS}
+                return make_response(jsonify(upd_movie), 200)
+            else:
+                return make_response(jsonify(error='ERROR'), 400)
+
         except:
             err = 'Id must be integer'
             return make_response(jsonify(error=err), 400)
-
-    upd_record = Movie.update(row_id, **data)
-    upd_movie = {k: v for k, v in upd_record.__dict__.items() if k in MOVIE_FIELDS}
-    return make_response(jsonify(upd_movie), 200)
 
 
 def delete_movie():
@@ -104,7 +116,6 @@ def movie_add_relation():
             err = 'Id must be integer'
             return make_response(jsonify(error=err), 400)
 
-
 def movie_clear_relations():
     """
     Clear all relations by id
@@ -112,11 +123,18 @@ def movie_clear_relations():
     data = get_request_data()
     if 'id' in data.keys():
         try:
-            row_id = int(data['id'])
-            movie = Movie.clear_relations(row_id)
-            rel_movie = {k: v for k, v in movie.__dict__.items() if k in MOVIE_FIELDS}
-            rel_movie['cast'] = str(movie.cast)
-            return make_response(jsonify(rel_movie), 200)
+            movie_id = int(data['id'])
         except:
             err = 'Id must be integer'
             return make_response(jsonify(error=err), 400)
+        movie = Movie.clear_relations(movie_id)
+        try:
+            rel_movie = {k: v for k, v in movie.__dict__.items() if k in MOVIE_FIELDS}
+        except:
+            err = 'Record with such id does not exist'
+            return make_response(jsonify(error=err), 400)
+        rel_movie['cast'] = str(movie.cast)
+        return make_response(jsonify(rel_movie), 200)
+    else:
+        err = 'No id specified'
+        return make_response(jsonify(error=err), 400)

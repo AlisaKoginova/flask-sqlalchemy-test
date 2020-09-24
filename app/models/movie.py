@@ -1,7 +1,8 @@
-from datetime import datetime as dt
-from .base import Model
 
-from ..core import db
+from .base import Model
+from datetime import datetime as dt
+
+from core import db
 from .relations import association
 
 class Movie(Model, db.Model):

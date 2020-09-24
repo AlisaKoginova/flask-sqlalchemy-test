@@ -1,8 +1,8 @@
-from flask import request
+from flask import Flask, request
 from flask import current_app as app
 
-from ..controllers.actor import *
-from ..controllers.movie import *
+from controllers.actor import *
+from controllers.movie import *
 
 @app.route('/api/actors', methods=['GET'])
 def actors():
@@ -12,11 +12,11 @@ def actors():
 def actor():
     if request.method == 'GET':
         return get_actor_by_id()
-    elif request.method == 'POST':
+    if request.method == 'POST':
         return add_actor()
-    elif request.method == 'PUT':
+    if request.method == 'PUT':
         return update_actor()
-    elif request.method == 'DELETE':
+    if request.method == 'DELETE':
         return delete_actor()
 
 @app.route('/api/actor-relations', methods=['PUT', 'DELETE'])
@@ -34,16 +34,16 @@ def movies():
 def movie():
     if request.method == 'GET':
         return get_movie_by_id()
-    elif request.method == 'POST':
+    if request.method == 'POST':
         return add_movie()
-    elif request.method == 'PUT':
+    if request.method == 'PUT':
         return update_movie()
-    elif request.method == 'DELETE':
+    if request.method == 'DELETE':
         return delete_movie()
 
 @app.route('/api/movie-relations', methods=['PUT', 'DELETE'])
 def movie_relations():
     if request.method == 'PUT':
         return movie_add_relation()
-    elif request.method == 'DELETE':
+    if request.method == 'DELETE':
         return movie_clear_relations()
