@@ -48,7 +48,6 @@ def add_actor():
     """
     Add new actor
     """
-    ### YOUR CODE HERE ###
     data = get_request_data()
     if 'name' in data.keys():
         if 'date_of_birth' in data.keys():
@@ -78,7 +77,6 @@ def add_actor():
     else:
         err = 'No name specified'
         return make_response(jsonify(error=err), 400)
-    ### END CODE HERE ###
 
 
 def update_actor():
